@@ -44,5 +44,11 @@ class StreamSpec extends WordSpec {
       assert(effect1 == 0)
       assert(effect2 == 1)
     }
+
+    "takeWhile" in {
+      assert(Stream(1, 2, 3).takeWhile(_ < 0).toList == Nil)
+      assert(Stream(1, 2, 3).takeWhile(_ < 2).toList == List(1))
+      assert(Stream(1, 2, 3).takeWhile(_ < 5).toList == List(1, 2, 3))
+    }
   }
 }

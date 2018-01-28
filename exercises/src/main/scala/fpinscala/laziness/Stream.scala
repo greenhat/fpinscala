@@ -22,7 +22,12 @@ trait Stream[+A] {
       else t().drop(n - 1)
   }
 
-  def takeWhile(p: A => Boolean): Stream[A] = ???
+  def takeWhile(p: A => Boolean): Stream[A] = this match {
+    case Empty => Empty
+    case Cons(h, t) =>
+      if (p(h())) Cons(h, () => t().takeWhile(p))
+      else Empty
+  }
 
   def forAll(p: A => Boolean): Boolean = ???
 
