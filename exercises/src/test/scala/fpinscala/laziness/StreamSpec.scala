@@ -14,5 +14,11 @@ class StreamSpec extends WordSpec {
       assert(Stream(1, 2, 3).take(2).toList == List(1, 2))
       assert(Stream(1, 2, 3).take(4).toList == List(1, 2, 3))
     }
+
+    "drop n" in {
+      assert(Stream(1, 2, 3).drop(1).toList == List(2, 3))
+      assert(Stream(1, 2, 3).drop(2).toList == List(3))
+      assert(Stream(1, 2, 3).drop(4).toList == Nil)
+    }
   }
 }
