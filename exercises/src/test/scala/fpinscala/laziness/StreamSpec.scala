@@ -30,5 +30,19 @@ class StreamSpec extends WordSpec {
       assert(Stream(1, 2, 3).drop(2).toList == List(3))
       assert(Stream(1, 2, 3).drop(4).toList == Nil)
     }
+
+    "drop n is lazy" in {
+      var effect1 = 0
+      var effect2 = 0
+      val stream = Stream.cons({ effect1 += 1; 1 }, Stream.cons({ effect2 += 1; 2 }, Stream(3)))
+      assert(effect1 == 0)
+      assert(effect2 == 0)
+      val droppedStream = stream.drop(1)
+      assert(effect1 == 0)
+      assert(effect2 == 0)
+      assert(droppedStream.toList == List(2, 3))
+      assert(effect1 == 0)
+      assert(effect2 == 1)
+    }
   }
 }
