@@ -9,7 +9,12 @@ trait Stream[+A] {
     case Cons(h, t) => h() :: t().toList
   }
 
-  def take(n: Int): Stream[A] = ???
+  def take(n: Int): Stream[A] = this match {
+    case Empty => Empty
+    case Cons(h, t) =>
+      if (n == 0) Empty
+      else Cons(h, () => t().take(n - 1))
+  }
 
   def drop(n: Int): Stream[A] = ???
 
