@@ -1,8 +1,8 @@
 package fpinscala.laziness
 
-import org.scalatest.WordSpec
+import org.scalatest.{Matchers, WordSpec}
 
-class StreamSpec extends WordSpec {
+class StreamSpec extends WordSpec with Matchers {
 
   "Stream" should {
     "force eval in toList" in {
@@ -49,6 +49,18 @@ class StreamSpec extends WordSpec {
       assert(Stream(1, 2, 3).takeWhile(_ < 0).toList == Nil)
       assert(Stream(1, 2, 3).takeWhile(_ < 2).toList == List(1))
       assert(Stream(1, 2, 3).takeWhile(_ < 5).toList == List(1, 2, 3))
+    }
+
+    "forAll" in {
+      Stream(1, 2, 3).forAll(_ > 1) shouldBe false
+      Stream(1, 2, 3).forAll(_ > 0) shouldBe true
+    }
+
+    "forAll is lazy" in {
+      var effect = 0
+      val stream = Stream.cons(1, Stream.cons({ effect += 1; 2 }, Stream(3)))
+      stream.forAll(_ > 1) shouldBe false
+      effect shouldBe 0
     }
   }
 }
