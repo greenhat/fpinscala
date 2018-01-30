@@ -83,5 +83,9 @@ class StreamSpec extends WordSpec with Matchers {
       Stream(1, 2).append(Stream.empty[Int]).toList shouldBe List(1, 2)
       Stream.empty[Int].append(Stream(3, 4)).toList shouldBe List(3, 4)
     }
+
+    "flatMap" in {
+      Stream(1, 2).flatMap(a => Stream(a.toString)).toList shouldBe List("1", "2")
+    }
   }
 }
