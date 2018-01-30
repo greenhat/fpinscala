@@ -68,5 +68,9 @@ class StreamSpec extends WordSpec with Matchers {
       assert(Stream(1, 2).headOption.contains(1))
       assert(Stream.empty[Int].headOption.isEmpty)
     }
+
+    "map" in {
+      assert(Stream(1, 2).map(_.toString).toList == List("1", "2"))
+    }
   }
 }
