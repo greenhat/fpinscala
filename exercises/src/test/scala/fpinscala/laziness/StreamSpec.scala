@@ -4,7 +4,7 @@ import org.scalatest.{Matchers, WordSpec}
 
 class StreamSpec extends WordSpec with Matchers {
 
-  "Stream" should {
+  "Stream" can {
     "force eval in toList" in {
       assert(Stream(1, 2, 3).toList == List(1, 2, 3))
     }
@@ -51,16 +51,17 @@ class StreamSpec extends WordSpec with Matchers {
       assert(Stream(1, 2, 3).takeWhile(_ < 5).toList == List(1, 2, 3))
     }
 
-    "forAll" in {
-      Stream(1, 2, 3).forAll(_ > 1) shouldBe false
-      Stream(1, 2, 3).forAll(_ > 0) shouldBe true
-    }
-
-    "forAll is lazy" in {
-      var effect = 0
-      val stream = Stream.cons(1, Stream.cons({ effect += 1; 2 }, Stream(3)))
-      stream.forAll(_ > 1) shouldBe false
-      effect shouldBe 0
+    "forAll" should {
+      "be correct" in {
+        Stream(1, 2, 3).forAll(_ > 1) shouldBe false
+        Stream(1, 2, 3).forAll(_ > 0) shouldBe true
+      }
+      "be lazy" in {
+        var effect = 0
+        val stream = Stream.cons(1, Stream.cons({ effect += 1; 2 }, Stream(3)))
+        stream.forAll(_ > 1) shouldBe false
+        effect shouldBe 0
+      }
     }
   }
 }
