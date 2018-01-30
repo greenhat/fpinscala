@@ -66,6 +66,7 @@ class StreamSpec extends WordSpec with Matchers {
 
     "headOption" in {
       assert(Stream(1, 2).headOption.contains(1))
+      assert(Stream.empty[Int].headOption.isEmpty)
     }
   }
 }
