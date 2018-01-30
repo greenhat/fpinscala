@@ -72,5 +72,10 @@ class StreamSpec extends WordSpec with Matchers {
     "map" in {
       assert(Stream(1, 2).map(_.toString).toList == List("1", "2"))
     }
+
+    "filter" in {
+      Stream(1, 2).filter(_ % 2 == 0).toList shouldBe List(2)
+      Stream(1, 2).filter(_ == 1).toList shouldBe List(1)
+    }
   }
 }
