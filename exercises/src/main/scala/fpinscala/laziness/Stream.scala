@@ -12,13 +12,13 @@ trait Stream[+A] {
   def take(n: Int): Stream[A] = this match {
     case Empty => Empty
     case Cons(_, _) if n == 0 => Empty
-    case Cons(h, t) => Cons(h, () => t().take(n - 1))
+    case Cons(h, t) => cons(h(), t().take(n - 1))
   }
 
   def drop(n: Int): Stream[A] = this match {
     case Empty => Empty
     case Cons(h, t) =>
-      if (n == 0) Cons(h, t)
+      if (n == 0) cons(h(), t())
       else t().drop(n - 1)
   }
 
