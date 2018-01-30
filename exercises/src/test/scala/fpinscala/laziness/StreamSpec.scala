@@ -77,5 +77,11 @@ class StreamSpec extends WordSpec with Matchers {
       Stream(1, 2).filter(_ % 2 == 0).toList shouldBe List(2)
       Stream(1, 2).filter(_ == 1).toList shouldBe List(1)
     }
+
+    "append" in {
+      Stream(1, 2).append(Stream(3, 4)).toList shouldBe List(1, 2, 3, 4)
+      Stream(1, 2).append(Stream.empty[Int]).toList shouldBe List(1, 2)
+      Stream.empty[Int].append(Stream(3, 4)).toList shouldBe List(3, 4)
+    }
   }
 }
