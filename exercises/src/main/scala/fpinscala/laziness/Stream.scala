@@ -79,12 +79,14 @@ object Stream {
 
   def constant[A](a: A): Stream[A] = cons(a, constant(a))
 
-  def from(n: Int): Stream[Int] = cons(n, from(n + 1))
+  def from(n: Int): Stream[Int] = unfold(n)(s => Some((s, s + 1)))
 
   def fibs: Stream[Int] = {
     def loop(prev1: Int, prev2: Int): Stream[Int] = cons(prev1, loop(prev2, prev1 + prev2))
     loop(0, 1)
   }
 
-  def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] = ???
+  def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] = f(z).map {
+    case (a, s) => cons(a, unfold(s)(f))
+  }.getOrElse(empty)
 }
