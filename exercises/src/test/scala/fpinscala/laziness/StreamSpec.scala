@@ -95,5 +95,9 @@ class StreamSpec extends WordSpec with Matchers {
     "fibs" in {
       Stream.fibs.take(6).toList shouldBe List(0, 1, 1, 2, 3, 5)
     }
+
+    "unfold terminates" in {
+      Stream.unfold(3)(s => if (s > 0) Some((s, s - 1)) else None).toList shouldBe List(3, 2, 1)
+    }
   }
 }
