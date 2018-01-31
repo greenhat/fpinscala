@@ -91,5 +91,9 @@ class StreamSpec extends WordSpec with Matchers {
     "from" in {
       Stream.from(2).take(3).toList shouldBe List(2, 3, 4)
     }
+
+    "fibs" in {
+      Stream.fibs.take(6).toList shouldBe List(0, 1, 1, 2, 3, 5)
+    }
   }
 }
