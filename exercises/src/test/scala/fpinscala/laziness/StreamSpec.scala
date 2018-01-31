@@ -87,5 +87,9 @@ class StreamSpec extends WordSpec with Matchers {
     "flatMap" in {
       Stream(1, 2).flatMap(a => Stream(a.toString)).toList shouldBe List("1", "2")
     }
+
+    "from" in {
+      Stream.from(2).take(3).toList shouldBe List(2, 3, 4)
+    }
   }
 }
