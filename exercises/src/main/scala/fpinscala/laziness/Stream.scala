@@ -2,6 +2,8 @@ package fpinscala.laziness
 
 import Stream._
 
+import scala.annotation.tailrec
+
 trait Stream[+A] {
 
   def toList: List[A] = this match {
@@ -63,7 +65,12 @@ trait Stream[+A] {
   def flatMap[B](f: A => Stream[B]): Stream[B] =
     foldRight(empty[B])((a, b) => f(a).append(b))
 
-  def startsWith[B](s: Stream[B]): Boolean = ???
+  def startsWith[B](s: Stream[B]): Boolean =
+    zipAll(s).forAll {
+      case (Some(a), Some(b)) => a == b
+      case (Some(_), None) => true
+      case _ => false
+    }
 
   def zipWith[B, C](s2: Stream[B])(f: (A, B) => C): Stream[C] =
     unfold((this, s2)) {
