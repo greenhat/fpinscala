@@ -113,5 +113,9 @@ class StreamSpec extends WordSpec with Matchers {
       Stream(1, 2, 3).startsWith(Stream(2)) shouldEqual false
       Stream(1, 2, 3).startsWith(Stream(1, 2, 3, 4)) shouldEqual false
     }
+
+    "tails" in {
+      Stream(1, 2, 3).tails.toList.map(_.toList) shouldEqual List(List(1, 2, 3), List(2, 3), List(3), List())
+    }
   }
 }
