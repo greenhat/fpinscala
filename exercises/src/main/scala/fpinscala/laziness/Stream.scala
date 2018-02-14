@@ -23,7 +23,10 @@ trait Stream[+A] {
   }
 
   def takeWhile(p: A => Boolean): Stream[A] =
-    foldRight(empty[A])((a, b) => if (p(a)) cons(a, b) else Empty)
+    unfold(this) {
+      case Cons(h, t) if p(h()) => Some(h, t())
+      case _ => None
+    }
 
   def foldRight[B](z: => B)(f: (A, => B) => B): B = // The arrow `=>` in front of the argument type `B` means that the function `f` takes its second argument by name and may choose not to evaluate it.
     this match {
