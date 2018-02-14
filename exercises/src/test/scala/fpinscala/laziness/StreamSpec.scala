@@ -103,5 +103,9 @@ class StreamSpec extends WordSpec with Matchers {
     "zipWith" in {
       Stream(1, 2).zipWith(Stream("a", "b"))((_, _)).toList shouldEqual List((1, "a"), (2, "b"))
     }
+
+    "zipAll" in {
+      Stream(1, 2).zipAll(Stream("a")).toList shouldEqual List((Some(1), Some("a")), (Some(2), None))
+    }
   }
 }
