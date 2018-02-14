@@ -15,12 +15,6 @@ trait Stream[+A] {
       case _ => None
     }
 
-//    this match {
-//    case Empty => Empty
-//    case Cons(_, _) if n == 0 => Empty
-//    case Cons(h, t) => cons(h(), t().take(n - 1))
-//  }
-
   def drop(n: Int): Stream[A] = this match {
     case Empty => Empty
     case Cons(h, t) =>
