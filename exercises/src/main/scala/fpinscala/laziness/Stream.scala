@@ -46,7 +46,10 @@ trait Stream[+A] {
     foldRight(None.asInstanceOf[Option[A]])((a, _) => Some(a))
 
   def map[B](f: A => B): Stream[B] =
-    foldRight(empty[B])((a, b) => cons(f(a), b))
+    unfold(this) {
+      case Cons(h, t) => Some(f(h()), t())
+      case Empty => None
+    }
 
   def filter(p: A => Boolean): Stream[A] =
     foldRight(empty[A])((a, b) => if (p(a)) cons(a, b) else b)
