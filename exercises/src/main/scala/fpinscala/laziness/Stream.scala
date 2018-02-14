@@ -9,11 +9,17 @@ trait Stream[+A] {
     case Cons(h, t) => h() :: t().toList
   }
 
-  def take(n: Int): Stream[A] = this match {
-    case Empty => Empty
-    case Cons(_, _) if n == 0 => Empty
-    case Cons(h, t) => cons(h(), t().take(n - 1))
-  }
+  def take(n: Int): Stream[A] =
+    unfold((this, 0)) {
+      case (Cons(h, t), taken) if taken < n => Some((h, (t(), taken + 1)))
+      case _ => None
+    }
+
+//    this match {
+//    case Empty => Empty
+//    case Cons(_, _) if n == 0 => Empty
+//    case Cons(h, t) => cons(h(), t().take(n - 1))
+//  }
 
   def drop(n: Int): Stream[A] = this match {
     case Empty => Empty
@@ -47,7 +53,7 @@ trait Stream[+A] {
 
   def map[B](f: A => B): Stream[B] =
     unfold(this) {
-      case Cons(h, t) => Some(f(h()), t())
+      case Cons(h, t) => Some(() => f(h()), t())
       case Empty => None
     }
 
@@ -78,17 +84,17 @@ object Stream {
     if (as.isEmpty) empty 
     else cons(as.head, apply(as.tail: _*))
 
-  val ones: Stream[Int] = unfold(1)(s => Some(s, s))
+  val ones: Stream[Int] = unfold(1)(s => Some(() => s, s))
 
-  def constant[A](a: A): Stream[A] = unfold(a)(s => Some(s, s))
+  def constant[A](a: A): Stream[A] = unfold(a)(s => Some(() => s, s))
 
-  def from(n: Int): Stream[Int] = unfold(n)(s => Some((s, s + 1)))
+  def from(n: Int): Stream[Int] = unfold(n)(s => Some((() => s, s + 1)))
 
   def fibs: Stream[Int] = unfold((0, 1))({
-    case (prev1, prev2) => Some((prev1, (prev2, prev1 + prev2)))
+    case (prev1, prev2) => Some((() => prev1, (prev2, prev1 + prev2)))
   })
 
-  def unfold[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] = f(z).map {
-    case (a, s) => cons(a, unfold(s)(f))
+  def unfold[A, S](z: S)(f: S => Option[(() => A, S)]): Stream[A] = f(z).map {
+    case (a, s) => cons(a(), unfold(s)(f))
   }.getOrElse(empty)
 }
