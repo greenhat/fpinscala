@@ -44,7 +44,12 @@ object RNG {
 
   def ints(count: Int)(rng: RNG): (List[Int], RNG) = ???
 
-  def map2[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] = ???
+  def map2[A,B,C](ra: Rand[A], rb: Rand[B])(f: (A, B) => C): Rand[C] =
+    rng => {
+      val (a, arng) = ra(rng)
+      val (b, _) = rb(rng)
+      (f(a, b), arng)
+    }
 
   def sequence[A](fs: List[Rand[A]]): Rand[List[A]] = ???
 

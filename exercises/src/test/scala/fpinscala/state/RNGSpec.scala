@@ -23,4 +23,10 @@ class RNGSpec extends PropSpec
     }
   }
 
+  property("map2") {
+    forAll(longGen) { l: Long =>
+      map2(int, int)(_.toLong + _.toLong)(Simple(l))._1 should (be >= Long.MinValue and be <= Long.MaxValue)
+    }
+  }
+
 }
