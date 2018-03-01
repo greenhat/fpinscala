@@ -34,4 +34,11 @@ class RNGSpec extends PropSpec
       sequence(List.fill(10)(int))(Simple(l))._1.length shouldBe 10
     }
   }
+
+  property("flatMap") {
+    forAll(longGen) { l: Long =>
+      flatMap(int)(a => unit(a))(Simple(l))._1 should (be >= Int.MinValue and be <= Int.MaxValue)
+
+    }
+  }
 }
