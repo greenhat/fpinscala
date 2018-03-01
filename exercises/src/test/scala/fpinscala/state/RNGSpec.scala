@@ -31,7 +31,7 @@ class RNGSpec extends PropSpec
 
   property("sequence") {
     forAll(longGen) { l: Long =>
-      sequence(List(int, int))(Simple(l))._1.length shouldBe 2
+      sequence(List.fill(10)(int))(Simple(l))._1.length shouldBe 10
     }
   }
 }
