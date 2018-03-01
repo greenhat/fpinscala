@@ -41,4 +41,11 @@ class RNGSpec extends PropSpec
 
     }
   }
+
+  property("nonNegativeLessThan") {
+    forAll(longGen) { l: Long =>
+      nonNegativeLessThan(10)(Simple(l))._1 should (be >= 0 and be < 10)
+
+    }
+  }
 }
