@@ -90,7 +90,7 @@ trait Stream[+A] {
     unfold[Stream[A], Option[Stream[A]]](Some(this)){
       case Some(ref@Cons(_, t)) => Some((() => ref, Some(t())))
       case Some(Empty) => Some((() => empty, None))
-      case None => None
+      case _ => None
     }
 }
 case object Empty extends Stream[Nothing]
