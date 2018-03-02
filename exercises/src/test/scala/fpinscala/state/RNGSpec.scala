@@ -3,13 +3,16 @@ package fpinscala.state
 import org.scalacheck.Gen
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import org.scalatest.{Matchers, PropSpec}
-import RNG._
+
+trait Generators {
+  val longGen: Gen[Long] = Gen.choose(Long.MinValue, Long.MaxValue)
+}
 
 class RNGSpec extends PropSpec
   with Matchers
-  with GeneratorDrivenPropertyChecks {
-
-  private val longGen = Gen.choose(Long.MinValue, Long.MaxValue)
+  with GeneratorDrivenPropertyChecks
+  with Generators {
+  import RNG._
 
   property("nonNegativeInt") {
     forAll(longGen) { l: Long =>
