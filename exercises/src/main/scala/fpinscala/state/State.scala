@@ -125,15 +125,17 @@ object State {
     State[Machine, (Int, Int)] { inputMachine =>
       def loop(resState: ((Int, Int), Machine), rest: List[Input]): ((Int, Int), Machine) = {
         val machine = resState._2
+        val candiesLeft = resState._1._1
+        val coinsLeft = resState._1._1
         rest match {
           case input :: t if machine.candies > 0 => loop(
             input match {
               case Coin if machine.locked =>
-                ((0, 0), Machine(locked = false, candies = machine.candies, coins = machine.coins + 1))
+                ((candiesLeft, coinsLeft + 1), Machine(locked = false, candies = machine.candies, coins = machine.coins + 1))
             }, t)
           case _ => resState
         }
       }
-      loop(((0, 0), inputMachine), inputs)
+      loop(((inputMachine.candies, inputMachine.coins), inputMachine), inputs)
     }
 }

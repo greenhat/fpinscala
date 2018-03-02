@@ -10,7 +10,7 @@ class CandyDispenserSpec extends FlatSpec
       Coin
     )).run(
       Machine(locked = true, candies = 1, coins = 1)
-    ) shouldEqual ((0, 0), Machine(locked = false, candies = 1, coins = 2))
+    ) shouldEqual ((1, 2), Machine(locked = false, candies = 1, coins = 2))
   }
 
 }
