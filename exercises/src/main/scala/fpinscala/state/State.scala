@@ -118,17 +118,17 @@ object State {
     case Nil => unit(Nil)
   }
 
-  def mod(m: Machine, input: Input): ((Int, Int), Machine) = input match {
+  def update(m: Machine, input: Input): ((Int, Int), Machine) = (input match {
     case Coin if m.locked && m.candies > 0 =>
-      ((m.candies, m.coins + 1), Machine(locked = false, candies = m.candies, coins = m.coins + 1))
+      Machine(locked = false, candies = m.candies, coins = m.coins + 1)
     case Turn if !m.locked && m.candies > 0 =>
-      ((m.candies - 1, m.coins), Machine(locked = true, candies = m.candies - 1, coins = m.coins))
-    case _ => ((m.candies, m.coins), m)
-  }
+      Machine(locked = true, candies = m.candies - 1, coins = m.coins)
+    case _ => m
+  }) match { case ref@Machine(_, candies, coins) => ((candies, coins), ref) }
 
   def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] =
     sequence(
       inputs.map { input =>
-        State[Machine, (Int, Int)] { m => mod(m, input) }
+        State[Machine, (Int, Int)] { m => update(m, input) }
       }).map(_.lastOption.getOrElse((0,0)))
 }
