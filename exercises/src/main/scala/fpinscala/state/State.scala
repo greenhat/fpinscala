@@ -118,11 +118,10 @@ object State {
     case Nil => unit(Nil)
   }
 
-  def update(m: Machine, input: Input): ((Int, Int), Machine) = (input match {
-    case Coin if m.locked && m.candies > 0 =>
-      Machine(locked = false, candies = m.candies, coins = m.coins + 1)
-    case Turn if !m.locked && m.candies > 0 =>
-      Machine(locked = true, candies = m.candies - 1, coins = m.coins)
+  def update(m: Machine, input: Input): ((Int, Int), Machine) = ((input, m) match {
+    case (_, Machine(_, 0, _)) => m
+    case (Coin, Machine(true, candies, coins)) => Machine(locked = false, candies, coins + 1)
+    case (Turn, Machine(false, candies, coins)) => Machine(locked = true, candies - 1, coins)
     case _ => m
   }) match { case ref@Machine(_, candies, coins) => ((candies, coins), ref) }
 
