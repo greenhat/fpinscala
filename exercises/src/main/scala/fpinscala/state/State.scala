@@ -74,11 +74,8 @@ object RNG {
 
 case class State[S,+A](run: S => (A, S)) {
 
-  def unit[B](b: B): State[S, B] =
-    State[S, B](rng => (b, rng))
-
   def map[B](f: A => B): State[S, B] =
-    flatMap(a => unit(f(a)))
+    flatMap(a => State.unit(f(a)))
 
   def map2[B,C](sb: State[S, B])(f: (A, B) => C): State[S, C] =
     for {
@@ -90,14 +87,6 @@ case class State[S,+A](run: S => (A, S)) {
     State[S, B] { s =>
       val (a, s2) = this.run(s)
       f(a).run(s2)
-    }
-
-  def sequence[B](fs: List[State[S, B]]): State[S, List[B]] =
-    State[S, List[B]] { s =>
-      fs match {
-        case h :: t => sequence(t).map(l => h.run(s)._1 +: l).run(s)
-        case Nil => unit(Nil).run(s)
-      }
     }
 }
 
@@ -121,25 +110,51 @@ object State {
       _ <- set(f(s))
     } yield ()
 
-  def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] =
-    State[Machine, (Int, Int)] { inputMachine =>
-      def loop(resState: ((Int, Int), Machine), rest: List[Input]): ((Int, Int), Machine) = {
-        val machine = resState._2
-        val candiesLeft = resState._1._1
-        val coinsLeft = resState._1._2
-        rest match {
-          case input :: t if machine.candies > 0 => loop(
-            input match {
-              case Coin if machine.locked =>
-                ((candiesLeft, coinsLeft + 1), Machine(locked = false, candies = machine.candies, coins = machine.coins + 1))
-              case Coin if !machine.locked => resState
-              case Turn if machine.locked => resState
-              case Turn if !machine.locked =>
-                ((candiesLeft - 1, coinsLeft), Machine(locked = true, candies = machine.candies - 1, coins = machine.coins))
-            }, t)
-          case _ => resState
-        }
+  def unit[S, B](b: B): State[S, B] =
+    State[S, B](rng => (b, rng))
+
+  def sequence[S, B](fs: List[State[S, B]]): State[S, List[B]] =
+    State[S, List[B]] { s =>
+      fs match {
+        case h :: t => sequence(t).map(l => h.run(s)._1 +: l).run(s)
+        case Nil => unit(Nil).run(s)
       }
-      loop(((inputMachine.candies, inputMachine.coins), inputMachine), inputs)
     }
+
+  def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] = {
+    sequence(
+      inputs.map { input =>
+        State[Machine, (Int, Int)] { machine =>
+          input match {
+            case Coin if machine.locked && machine.candies > 0 =>
+              ((machine.candies, machine.coins + 1), Machine(locked = false, candies = machine.candies, coins = machine.coins + 1))
+            case Turn if !machine.locked && machine.candies > 0 =>
+              ((machine.candies - 1, machine.coins), Machine(locked = true, candies = machine.candies - 1, coins = machine.coins))
+            case _ => ((machine.candies, machine.coins), machine)
+          }
+        }
+      }).map(_.last)
+  }
+
+//  def simulateMachineNaive(inputs: List[Input]): State[Machine, (Int, Int)] =
+//    State[Machine, (Int, Int)] { inputMachine =>
+//      def loop(resState: ((Int, Int), Machine), rest: List[Input]): ((Int, Int), Machine) = {
+//        val machine = resState._2
+//        val candiesLeft = resState._1._1
+//        val coinsLeft = resState._1._2
+//        rest match {
+//          case input :: t if machine.candies > 0 => loop(
+//            input match {
+//              case Coin if machine.locked =>
+//                ((candiesLeft, coinsLeft + 1), Machine(locked = false, candies = machine.candies, coins = machine.coins + 1))
+//              case Coin if !machine.locked => resState
+//              case Turn if machine.locked => resState
+//              case Turn if !machine.locked =>
+//                ((candiesLeft - 1, coinsLeft), Machine(locked = true, candies = machine.candies - 1, coins = machine.coins))
+//            }, t)
+//          case _ => resState
+//        }
+//      }
+//      loop(((inputMachine.candies, inputMachine.coins), inputMachine), inputs)
+//    }
 }
