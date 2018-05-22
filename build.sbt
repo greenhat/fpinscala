@@ -20,3 +20,5 @@ lazy val answers = (project in file("answers"))
   .settings(
     name := "answers"
   )
+
+wartremoverErrors ++= Warts.allBut(Wart.Equals, Wart.ImplicitParameter, Wart.Product, Wart.Serializable)
