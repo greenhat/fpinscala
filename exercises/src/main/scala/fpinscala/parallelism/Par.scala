@@ -54,6 +54,14 @@ object Par {
     lazyUnit(f(a))
   }
 
+  def flatMap[A,B](pa: Par[A])(f: A => Par[B]): Par[B] =
+    es => f(pa(es).get)(es)
+
+  def sequence[A](ps: List[Par[A]]): Par[List[A]] = ps match {
+    case h::t => flatMap(h)(a => map(sequence(t))(as => a +: as))
+    case Nil => unit(Nil)
+  }
+
   /* Gives us infix syntax for `Par`. */
   implicit def toParOps[A](p: Par[A]): ParOps[A] = new ParOps(p)
 
