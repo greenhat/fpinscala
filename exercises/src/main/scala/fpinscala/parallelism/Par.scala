@@ -5,6 +5,7 @@ import java.util.concurrent._
 import fpinscala.parallelism.Nonblocking.Par.ParOps
 
 import language.implicitConversions
+import scala.collection.immutable
 
 object Par {
   type Par[A] = ExecutorService => Future[A]
@@ -61,6 +62,17 @@ object Par {
     case h::t => flatMap(h)(a => map(sequence(t))(as => a +: as))
     case Nil => unit(Nil)
   }
+
+  def parMap[A,B](ps: List[A])(f: A => B): Par[List[B]] = fork {
+    val fbs: List[Par[B]] = ps.map(asyncF(f))
+    sequence(fbs)
+  }
+
+  def parFilter[A](as: List[A])(f: A => Boolean): Par[List[A]] =
+    map(parMap(as)(f))(bs => bs.zip(as).flatMap {
+      case (true, a) => Seq(a)
+      case (false, _) => Nil
+    })
 
   /* Gives us infix syntax for `Par`. */
   implicit def toParOps[A](p: Par[A]): ParOps[A] = new ParOps(p)
